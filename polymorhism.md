@@ -1,3 +1,8 @@
+pattern matching and reflection uses runtime type,
+which in a way, is a runtime value, but still in
+all those cases (except julia?), they still are required
+to return the same type
+
 **can we do the runtime polymorphism and overloading
 in an immutable language the doesn't allow rereferencing
 or changing datatypes of variables? For example, one of the
@@ -10,6 +15,16 @@ but not modified after that... i guess
 still the benefit ofOO is that you have an expectation of where
 in the code those methods will be defined, whereas in julia they could be anywhere**
 
+type stability in julia... different methods of same
+function but with same return type
+
+Why do dynamic typing and dynamic dispatch have to go together? Do they not? Are they orthogonal?
+
+
+**previews of next episode and recap**
+
+# Episode 1
+
 - example of overloading vs overriding
   - two classes: car and civic
   - two functions: one overloaded, and one overridden
@@ -17,29 +32,101 @@ in the code those methods will be defined, whereas in julia they could be anywhe
     a car to typecheck on the list)
   - loop through the list and call ride... prints car ride and civic ride
   - loop through the list and call load... prints car load and car load
+
+i'll go slow
+| class | load       | ride       |
+| ----- | ---------- | ---------- |
+| car   | car load   | car ride   |
+| civic | civic load | civic ride |
+
+# Episode 2
+
+- vocabulary
+  - function overloading / ad hoc polymorphism / compile time dispatch / early binding
+  - runtime polymorphism / dynamic dispatch / method overriding / late binding
 - compile time vs runtime
-  - the union types are determined
-    - think of inheritance and subtypes as union types
-    - union types are ordered
-      - inheritance/subtypes
-      - normal union types... union vs individual
-- function overloading/ad hoc polymorphism
-  - compile time dispatch
-- runtime polymorphism / dynamic dispatch / function overriding
-  - single dispatch ... syntax is different... OO
-    - make the variable on which you're dispatching
-      unique syntactically
-  - multiple dispatch
-- compile time vs runtime (i.e. overloading vs overriding)
-  - overloading is done for completely diff types, i.e. 
-    not in a hierarchy or inheritance tree (usually... there
-    it could also be done inside a hierarchy... more on that
-    later), whereas overriding is done in an inheritance tree
+  - when are they different? confusing
+    - inheritance tree
+    - union types
+    - inheritance is union
+
+
+# Episode 3
+
+- when are same and when are different?
+  - not union, can use overload
+  - union, can't use overload
+- given this is the case, if the argument is a union
+  (or subtype), is there a way to get the early binding to
+  do what we want?
+  - yes, you have to use reflection to see the dynamic, runtime
+    type (maybe using pattern matching), and then use the function you want. 
+    - for example:
+      - in our car example, in the car overload, we could
+        have used reflection and said if it's a civic, call
+        the civic load function
+      - ```cs
+        public static void Load(Civic civic) {
+            Console.WriteLine("Civic load");
+        }
+
+        public static void Load(Car car) {
+            if (car is Civic) {
+                Load((Civic)car);
+            } else {
+                Console.WriteLine("Car load");
+            }
+        }
+        ```
+
+# Episode 4
+
+- why does polymorphism matter?
+  - civic vs car example
+
+
+# Episode 5
+
+- for example:
+  - ```
+    // static dispatch
+
+    f(x: t1) {}
+
+    f(x: t2) {}
+
+    f(x: union(t1 t2)) {
+      If type(x) == t1 then f(x cast t1)
+      Elsif type(x) == t2 then f(x cast t2)
+    }
+
+    // Dynamic dispatch
+
+    f(x: t1) {}
+
+    f(x: t2) {}
+    ```
+
+    **describe how this is related to car example**
+
+# Episode 6
+
 - OO langauges have the good one, but with some caveats
   - it only works on a single argument
-  - if it is done in a package, you can't modify it
+  - make the variable on which you're dispatching
+    unique syntactically
+  - single dispatch ... syntax is different... OO
+- multiple dispatch
+
+# Episode 7
+
+
 - where to define the implementations
   - inside the class vs outside the class
+- if it is done in a package, you can't modify it
+- car vs civic in a package
+- Unreasonable effectiveness of multiple dispatch video reference
+
 
 
 ```cs
