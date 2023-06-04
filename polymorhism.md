@@ -20,6 +20,12 @@ function but with same return type
 
 Why do dynamic typing and dynamic dispatch have to go together? Do they not? Are they orthogonal?
 
+julia
+
+make table
+
+python doesn't have overloading, except for on num
+of arguments?
 
 **previews of next episode and recap**
 
@@ -45,11 +51,119 @@ i'll go slow
   - function overloading / ad hoc polymorphism / compile time dispatch / early binding
   - runtime polymorphism / dynamic dispatch / method overriding / late binding
 - compile time vs runtime
-  - when are they different? confusing
+  - when are they different? "actual type vs compile type" confusing... more specific
     - inheritance tree
     - union types
     - inheritance is union
 
+
+
+# Episode 8 
+## Overloading
+
+overloading calls the function based on the static type
+
+```cs
+using System;
+
+public class Car {}
+
+public class Civic : Car {}
+
+public class Program {
+
+    public static void Load(Car car) { Console.WriteLine("Car load"); }
+
+	  public static void Load(Civic civic) { Console.WriteLine("Civic load"); }
+
+    public static void Main(string[] args) {
+
+		Car carcar = new Car(); Load(carcar);
+		Car car = new Civic(); Load(car);
+    Civic civic = new Civic(); Load(civic);
+
+  }
+}
+
+// Output:
+// Car load
+// Car load
+// Civic load
+```
+
+it will fall back.. it calls the most specific one
+based on the compile time type
+
+```cs
+using System;
+
+public class Car {}
+
+public class Civic : Car {}
+
+public class Program {
+
+    public static void Load(Car car) { Console.WriteLine("Car load"); }
+
+    public static void Main(string[] args) {
+
+		Car carcar = new Car(); Load(carcar);
+		Car car = new Civic(); Load(car);
+    Civic civic = new Civic(); Load(civic);
+
+  }
+}
+
+// Output:
+// Car load
+// Car load
+// Car load
+```
+
+ambiguity
+
+```cs
+
+using System;
+
+public class Car {}
+
+public class Civic : Car {}
+
+public class Program {
+
+    public static void Load(Car car, Civic civic) { Console.WriteLine("implementation 1"); }
+
+	public static void Load(Civic civic, Car car) { Console.WriteLine("implementation 2"); }
+
+    public static void Main(string[] args) {
+
+		Car car = new Civic();
+        Civic civic = new Civic();
+        Load(civic, civic);
+  }
+}
+
+// output
+// ambiguous function call
+
+```
+
+# Episode 9
+
+## Overloading vs multiple dispatch
+
+similarity:
+- dispatch on all args
+- if there isn't an implementation for the specific type, then
+  go up the tree to find the most specific implementation
+- possible to have ambiguity in call
+
+diff
+- compile time vs run time
+
+
+## Object oriented and overriding is confusing and we can do later
 
 # Episode 3
 
@@ -82,7 +196,9 @@ i'll go slow
 # Episode 4
 
 - why does polymorphism matter?
-  - civic vs car example
+  - civic vs car example.. both have `go` and
+    if all you care about is going from point a to point b,
+    then using the same name makes sense
 
 
 # Episode 5
@@ -127,6 +243,8 @@ i'll go slow
 - car vs civic in a package
 - Unreasonable effectiveness of multiple dispatch video reference
 
+
+# Misc
 
 
 ```cs
